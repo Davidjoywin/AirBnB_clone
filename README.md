@@ -9,5 +9,5 @@ With the command interpreter, we want to be able to  managethe objects of our pr
 
 AUTHORS
 DAVID JOY EGUNJOBI <davidjoy2k18@gmail.com>
-SAMUEL MACLAWRENCE <your email address>
+SAMUEL OKAFOR <samuelchif1245@gmail.com>
 
