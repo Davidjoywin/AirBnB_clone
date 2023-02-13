@@ -2,7 +2,7 @@
 """This is the base file of the model"""
 import uuid
 import datetime
-from __init__ import storage
+from models import storage
 
 class BaseModel:
     """Custom base for all the classes in AirBnB console project
