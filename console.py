@@ -2,10 +2,21 @@
 """Entry point of the command interpreter"""
 
 import cmd
+import sys
 import json
-from models.base_model import BaseModel
-from models import storage
 
+from models import storage
+from models.user import User
+from models.base_model import BaseModel
+
+
+model_apps = [
+        "BaseModel",
+        "User"
+        ]
+
+def get_class(name):
+    return getattr(sys.modules[__name__], name)
 
 class HBNBCommand(cmd.Cmd):
     """Command prompt
@@ -37,10 +48,11 @@ class HBNBCommand(cmd.Cmd):
     def do_create(self, line=None):
         """create a new instance of BaseModel, save if to JSON file"""
         if line:
-            if line == "BaseModel":
-                base = BaseModel()
-                base.save()
-                print(base.id)
+            if line in model_apps:
+                cls_from_name = get_class(line)
+                cls_model = cls_from_name()
+                cls_model.save()
+                print(cls_model.id)
             else:
                 print("** class doesn't exit **")
 
@@ -58,22 +70,24 @@ class HBNBCommand(cmd.Cmd):
 
         cls_name_id = line.split(" ")
         if len(cls_name_id) == 2:
-            if cls_name_id[0] == "BaseModel":
+            if cls_name_id[0] in model_apps:
                 name_id_key = ".".join(cls_name_id)
+                print(name_id_key)
                 try:
                     store = storage.all()
                     obj = store[name_id_key]
-                    new_model = BaseModel(**obj)
+                    cls_from_name = get_class(cls_name_id[0])
+                    new_model = cls_from_name(**obj)
                     print(new_model)
                     return
-                except:
+                except Exception as e:
                     print("** no instance found **")
                     return
             else:
                 print("** class doesn't exist **")
                 return
 
-        if line != "BaseModel":
+        if not line in model_apps:
             print("** class doesn't exist **")
             return
 
@@ -89,7 +103,7 @@ class HBNBCommand(cmd.Cmd):
 
         cls_name_id = line.split(" ")
         if len(cls_name_id) == 2:
-            if cls_name_id[0] == "BaseModel":
+            if cls_name_id[0] in model_apps:
                 name_id_key = ".".join(cls_name_id)
                 try:
                     store = storage.all()
@@ -104,7 +118,7 @@ class HBNBCommand(cmd.Cmd):
                 print("** class don't exist")
                 return
 
-        if line != "BaseModel":
+        if not line in model_apps:
             print("** class does't exit **")
             return
 
@@ -115,8 +129,14 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, line):
         """Prints all string representation of all instances based of not
         on the class name"""
-        if line == "BaseModel" or not line:
+        if not line:
             obj_list = [value for _, value in storage.all().items()]
+            print(obj_list)
+        elif line in model_apps:
+            obj_list = [
+                    value for key, value in storage.all().items()
+                    if key.startswith(line)
+            ]
             print(obj_list)
         else:
             print("** class doesn't exist **")
@@ -124,7 +144,6 @@ class HBNBCommand(cmd.Cmd):
     def do_update(self, line):
         """Updates an instance based on the class name and id by adding
         or updating attribute"""
-        non_updateables = ["id", "created_id", "updated_at"]
 
         if not line:
             print("** class name is missing **")
@@ -132,12 +151,13 @@ class HBNBCommand(cmd.Cmd):
 
         line_param = line.split(" ")
         if len(line_param) == 4:
-            if line_param[0] == "BaseModel":
+            if line_param[0] in model_apps:
                 name_id_key = ".".join(line_param[:2])
                 try:
                     store = storage.all()
                     obj = store[name_id_key]
-                    new_model = BaseModel(**obj)
+                    cls_from_name = get_class(line_param[0])
+                    new_model = cls_from_name(**obj)
                     setattr(new_model, line_param[2], line_param[3].strip("\""))
                     new_model.save()
                     return
@@ -145,7 +165,7 @@ class HBNBCommand(cmd.Cmd):
                     print("** no instance found **")
                     return
 
-        elif len(line_param) == 1 and line_param[0] == "BaseModel":
+        elif len(line_param) == 1 and line_param[0] in model_apps:
             print("** instance id missing **")
             return
 

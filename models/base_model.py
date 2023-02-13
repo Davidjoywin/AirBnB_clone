@@ -35,7 +35,7 @@ class BaseModel:
             for key, value in kwargs.items():
                 if key in ("updated_at", "created_at"):
                     self.__dict__[key] = value
-                elif key[0] == "id":
+                elif key == "id":
                     self.__dict__[key] = value
                 else:
                     self.__dict__[key] = value
