@@ -2,6 +2,7 @@
 """This is the base file of the model"""
 import uuid
 import datetime
+from __init__ import storage
 
 class BaseModel:
     """Custom base for all the classes in AirBnB console project
@@ -38,7 +39,7 @@ class BaseModel:
                     self.__dict__[key] = value
                 else:
                     self.__dict__[key] = value
-
+        storage.new(self)
 
     def __str__(self):
         """
@@ -50,6 +51,7 @@ class BaseModel:
     def save(self):
         """This method update the update_at attribute"""
         self.updated_at = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
+        storage.save()
 
     def to_dict(self):
         """returns the dict representation of the obj"""
