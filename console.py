@@ -7,16 +7,78 @@ import json
 
 from models import storage
 from models.user import User
+from models.place import Place
+from models.state import State
+from models.city import City
+from models.review import Review
+from models.amenity import Amenity
 from models.base_model import BaseModel
 
 
 model_apps = [
         "BaseModel",
-        "User"
+        "User",
+        "Place",
+        "State",
+        "City",
+        "Amenity",
+        "Review",
         ]
 
+
 def get_class(name):
+    """get the class from the class name"""
     return getattr(sys.modules[__name__], name)
+
+
+def get_all(model):
+    """retrieve all the instances of a class"""
+    store = storage.all()
+    cls_from_name = get_class(model)
+    list_models = [cls_from_name(value) for key, value in store.items() if key.startswith(model)]
+    return list_models
+
+
+def get_count(model):
+    """retrieve the number of instances of a class"""
+    return len(get_all())
+
+
+def show_with_id(id):
+    """retrives an instance based on its ID"""
+    store = storage.all()
+    for key, value in store.items():
+        if key.endswith(id):
+            return value
+    return None
+
+
+def destroy_with_id(id):
+    """destroy an instance based on his ID"""
+    store = storage.all()
+    res = None
+    for key, value in store.items():
+        if key.endswith(id):
+            del store.__objects[key]
+    store.save()
+
+
+def update(id, class_name, attr_name, attr_value):
+    """update an instance based on his ID"""
+    obj = show_with_id(id)
+    obj = class_name(**obj)
+    obj.__dict__[attr_name] = attr_value
+    obj.save()
+
+
+def update_with_dic(id, class_name, dict_obj):
+    """update an instance based on his ID with a dictionary"""
+    obj = show_with_id(id)
+    obj = class_name(**obj)
+    for key, value in obj.__dict__.keys():
+        dict_obj[key] = value
+    obj.save()
+
 
 class HBNBCommand(cmd.Cmd):
     """Command prompt
@@ -37,8 +99,19 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def default(self, line):
-        """Commands which are not defined"""
-        pass
+        """commands not defined"""
+        model_fun = line.split(".")
+        model_name = model_fun[0]
+        function_called = model_fun[1]
+        if model_name in model_apps:
+            if function_called == "all()":
+                get_all(model_name)
+            elif function_called == "count()":
+                pass
+
+    def emptyline(self):
+        """When nothing is entered"""
+        return False
 
     def do_help(self, *args):
         """list all the command available"""
@@ -80,14 +153,14 @@ class HBNBCommand(cmd.Cmd):
                     new_model = cls_from_name(**obj)
                     print(new_model)
                     return
-                except Exception as e:
+                except Exception:
                     print("** no instance found **")
                     return
             else:
                 print("** class doesn't exist **")
                 return
 
-        if not line in model_apps:
+        if line not in model_apps:
             print("** class doesn't exist **")
             return
 
@@ -111,14 +184,14 @@ class HBNBCommand(cmd.Cmd):
                     storage.__objects = store
                     storage.save()
                     return
-                except:
+                except Exception:
                     print("** no instance found **")
                     return
             else:
                 print("** class don't exist")
                 return
 
-        if not line in model_apps:
+        if line not in model_apps:
             print("** class does't exit **")
             return
 
@@ -158,10 +231,11 @@ class HBNBCommand(cmd.Cmd):
                     obj = store[name_id_key]
                     cls_from_name = get_class(line_param[0])
                     new_model = cls_from_name(**obj)
-                    setattr(new_model, line_param[2], line_param[3].strip("\""))
+                    stripped = line_param[3].strip("\"")
+                    setattr(new_model, line_param[2], stripped)
                     new_model.save()
                     return
-                except:
+                except Exception:
                     print("** no instance found **")
                     return
 

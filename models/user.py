@@ -4,7 +4,9 @@
 
 from .base_model import BaseModel
 
+
 class User(BaseModel):
+    """Class User that inherit from BaseModel"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.email = ""
