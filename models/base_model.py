@@ -4,6 +4,7 @@ import uuid
 import datetime
 from models import storage
 
+
 class BaseModel:
     """Custom base for all the classes in AirBnB console project
 
@@ -29,8 +30,10 @@ class BaseModel:
         DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
         if not kwargs:
             self.id = str(uuid.uuid4())
-            self.created_at = datetime.datetime.now().strftime(DATE_TIME_FORMAT)
-            self.updated_at = datetime.datetime.now().strftime(DATE_TIME_FORMAT)
+            self.created_at = datetime.datetime.now().strftime(
+                DATE_TIME_FORMAT)
+            self.updated_at = datetime.datetime.now().strftime(
+                DATE_TIME_FORMAT)
         else:
             for key, value in kwargs.items():
                 if key in ("updated_at", "created_at"):
@@ -43,14 +46,16 @@ class BaseModel:
 
     def __str__(self):
         """
-        Returns the string representation of class name, id and dictionary
-        represention of the object
+        Returns the string representation of class name,
+        id and dictionary represention of the object
         """
-        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
+        return "[{}] ({}) {}".format(
+            self.__class__.__name__, self.id, self.__dict__)
 
     def save(self):
         """This method update the update_at attribute"""
-        self.updated_at = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
+        self.updated_at = datetime.datetime.now().strftime(
+            DATE_TIME_FORMAT)
         storage.save()
 
     def to_dict(self):
@@ -58,4 +63,3 @@ class BaseModel:
         dic = self.__dict__
         dic["__class__"] = self.__class__.__name__
         return dic
-

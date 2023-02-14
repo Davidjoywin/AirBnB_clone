@@ -35,7 +35,10 @@ def get_all(model):
     """retrieve all the instances of a class"""
     store = storage.all()
     cls_from_name = get_class(model)
-    list_models = [cls_from_name(value) for key, value in store.items() if key.startswith(model)]
+    list_models = [
+        cls_from_name(value) for key, value in store.items()
+        if key.startswith(model)
+        ]
     return list_models
 
 

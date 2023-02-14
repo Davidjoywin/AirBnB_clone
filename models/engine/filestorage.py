@@ -1,7 +1,9 @@
 #!/usr/bin/python3
-"""serializes instances to a JSON file and deserialize JSON file to instances"""
+"""serializes instances to a JSON file and deserialize
+JSON file to instances"""
 
 import json
+
 
 class FileStorage:
     """Serializes instances to a JSON file and deserializes JSON file
@@ -29,6 +31,5 @@ class FileStorage:
         try:
             with open(self.__file_path, "r") as read_file:
                 self.__objects = json.load(read_file)
-        except:
+        except Exception:
             pass
-
